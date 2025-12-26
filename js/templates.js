@@ -6,38 +6,38 @@
 const Templates = (function() {
     // Template definitions - only 2 templates for 2-photo and 3-photo strips
     const templateList = [
-        // === 2-PHOTO TEMPLATE ===
+        // === 2-PHOTO TEMPLATE (Instagram Story Size) ===
         {
             id: '2-picture',
             name: '2 Photo Strip',
             category: 'strip',
             layout: 'strip',
             shots: 2,
-            frameImage: 'templates/frames/2 picture.png',
-            frameWidth: 707,
-            frameHeight: 2000,
+            frameImage: 'templates/frames/Merry Christmas 2.png',
+            frameWidth: 1080,
+            frameHeight: 1920,
             // Exact photo slot positions (x, y, width, height)
             photoSlots: [
-                { x: 46, y: 182, width: 614, height: 713 },   // Top photo (red border)
-                { x: 46, y: 937, width: 614, height: 712 }    // Bottom photo (yellow border)
+                { x: 130, y: 310, width: 830, height: 525 },   // Top photo
+                { x: 133, y: 970, width: 830, height: 525 }    // Bottom photo
             ],
             style: 'custom-frame'
         },
-        // === 3-PHOTO TEMPLATE ===
+        // === 3-PHOTO TEMPLATE (Instagram Story Size) ===
         {
             id: '3-picture',
             name: '3 Photo Strip',
             category: 'strip',
             layout: 'strip',
             shots: 3,
-            frameImage: 'templates/frames/3 picture.png',
-            frameWidth: 707,
-            frameHeight: 2000,
+            frameImage: 'templates/frames/Merry Christmas 3.png',
+            frameWidth: 1080,
+            frameHeight: 1920,
             // Exact photo slot positions (x, y, width, height)
             photoSlots: [
-                { x: 46, y: 180, width: 613, height: 458 },   // Top photo (red border)
-                { x: 46, y: 688, width: 613, height: 456 },   // Middle photo (cyan border)
-                { x: 46, y: 1192, width: 613, height: 456 }   // Bottom photo (yellow border)
+                { x: 130, y: 230, width: 600, height: 380 },   // Top photo
+                { x: 380, y: 700, width: 605, height: 385 },   // Middle photo
+                { x: 225, y: 1175, width: 595, height: 380 }   // Bottom photo
             ],
             style: 'custom-frame'
         }
