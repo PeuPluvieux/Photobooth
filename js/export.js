@@ -8,20 +8,34 @@ const Export = (function() {
      * Download canvas as image file
      */
     function downloadImage(canvas, filename = 'photobooth') {
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
-        const fullFilename = `${filename}_${timestamp}.png`;
+        try {
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+            const fullFilename = `${filename}_${timestamp}.png`;
 
-        // Create download link
-        const link = document.createElement('a');
-        link.download = fullFilename;
-        link.href = canvas.toDataURL('image/png');
+            console.log('Attempting to download:', fullFilename);
+            console.log('Canvas:', canvas.width, 'x', canvas.height);
 
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            // Create download link
+            const link = document.createElement('a');
+            link.download = fullFilename;
 
-        return fullFilename;
+            // Convert canvas to data URL
+            const dataUrl = canvas.toDataURL('image/png');
+            console.log('Data URL created, length:', dataUrl.length);
+
+            link.href = dataUrl;
+
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            console.log('Download link clicked');
+            return fullFilename;
+        } catch (error) {
+            console.error('Download error details:', error);
+            throw error;
+        }
     }
 
     /**

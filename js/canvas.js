@@ -147,61 +147,76 @@ const CanvasCompositor = (function() {
      * Composite photos with custom frame image overlay
      */
     async function compositeWithCustomFrame(capturedImages, template, isMirrored) {
-        return new Promise((resolve, reject) => {
-            const frameImg = new Image();
+        try {
+            // Load frame image as blob to avoid CORS issues
+            const response = await fetch(template.frameImage);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
 
-            frameImg.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+            return new Promise((resolve, reject) => {
+                const frameImg = new Image();
+                // No need for crossOrigin with blob URLs - they're same-origin
 
-                // Use template's defined frame dimensions
-                canvas.width = template.frameWidth || frameImg.width;
-                canvas.height = template.frameHeight || frameImg.height;
+                frameImg.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
 
-                // Fill white background
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    // Use template's defined frame dimensions
+                    canvas.width = template.frameWidth || frameImg.width;
+                    canvas.height = template.frameHeight || frameImg.height;
 
-                // Use exact photo slot positions from template
-                const photoSlots = template.photoSlots || [];
+                    // Fill white background
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Draw each captured image into its designated slot
-                capturedImages.forEach((imgData, index) => {
-                    if (index < photoSlots.length) {
-                        drawImageToArea(ctx, imgData, photoSlots[index], isMirrored, canvas.width);
-                    }
-                });
+                    // Use exact photo slot positions from template
+                    const photoSlots = template.photoSlots || [];
 
-                // Draw the custom frame image on top
-                ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+                    // Draw each captured image into its designated slot
+                    capturedImages.forEach((imgData, index) => {
+                        if (index < photoSlots.length) {
+                            drawImageToArea(ctx, imgData, photoSlots[index], isMirrored, canvas.width);
+                        }
+                    });
 
-                resolve(canvas);
-            };
+                    // Draw the custom frame image on top
+                    ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
-            frameImg.onerror = () => {
-                console.error('Failed to load frame image:', template.frameImage);
-                // Fallback to basic rendering without frame
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = STRIP_WIDTH;
-                canvas.height = STRIP_HEIGHT;
+                    // Clean up blob URL
+                    URL.revokeObjectURL(blobUrl);
 
-                const shots = template.shots || capturedImages.length;
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    resolve(canvas);
+                };
 
-                const photoAreas = calculateStripPhotoAreas(template, shots, canvas.width, canvas.height);
-                capturedImages.forEach((imgData, index) => {
-                    if (index < photoAreas.length) {
-                        drawImageToArea(ctx, imgData, photoAreas[index], isMirrored, canvas.width);
-                    }
-                });
+                frameImg.onerror = () => {
+                    console.error('Failed to load frame image from blob URL');
+                    URL.revokeObjectURL(blobUrl);
+                    reject(new Error('Failed to load frame image'));
+                };
 
-                resolve(canvas);
-            };
+                frameImg.src = blobUrl;
+            });
+        } catch (error) {
+            console.error('Failed to fetch frame image:', template.frameImage, error);
+            // Fallback to basic rendering without frame
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = STRIP_WIDTH;
+            canvas.height = STRIP_HEIGHT;
 
-            frameImg.src = template.frameImage;
-        });
+            const shots = template.shots || capturedImages.length;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const photoAreas = calculateStripPhotoAreas(template, shots, canvas.width, canvas.height);
+            capturedImages.forEach((imgData, index) => {
+                if (index < photoAreas.length) {
+                    drawImageToArea(ctx, imgData, photoAreas[index], isMirrored, canvas.width);
+                }
+            });
+
+            return canvas;
+        }
     }
 
     /**

@@ -613,11 +613,15 @@ const App = (function() {
                 }
             },
             async () => {
+                console.log('Compositing photos...');
                 const canvas = await CanvasCompositor.compositeStrip(
                     state.capturedFrames,
                     state.selectedTemplate,
                     false
                 );
+
+                console.log('Canvas created:', canvas ? 'Success' : 'Failed',
+                            canvas ? `${canvas.width}x${canvas.height}` : '');
 
                 state.capturedCanvas = canvas;
 
@@ -695,10 +699,20 @@ const App = (function() {
      * Download photo
      */
     function downloadPhoto() {
-        if (!state.capturedCanvas) return;
+        if (!state.capturedCanvas) {
+            console.error('No canvas to download');
+            alert('Error: No photo to download. Please capture a photo first.');
+            return;
+        }
 
-        const filename = state.isStripMode ? 'photostrip' : 'photobooth';
-        Export.downloadImage(state.capturedCanvas, filename);
+        try {
+            const filename = state.isStripMode ? 'Tanggera_Photobooth' : 'Tanggera_Photo';
+            const downloadedFile = Export.downloadImage(state.capturedCanvas, filename);
+            console.log('Download initiated:', downloadedFile);
+        } catch (error) {
+            console.error('Download error:', error);
+            alert('Error downloading photo. Please try again.');
+        }
     }
 
     /**
