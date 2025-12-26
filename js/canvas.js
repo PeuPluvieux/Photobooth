@@ -168,19 +168,26 @@ const CanvasCompositor = (function() {
                     // Fill white background
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    console.log('DEBUG: White background drawn');
 
                     // Use exact photo slot positions from template
                     const photoSlots = template.photoSlots || [];
 
+                    console.log('DEBUG: capturedImages count:', capturedImages.length);
+                    console.log('DEBUG: photoSlots count:', photoSlots.length);
+
                     // Draw each captured image into its designated slot
                     capturedImages.forEach((imgData, index) => {
+                        console.log('DEBUG: Drawing image', index, 'to slot:', photoSlots[index]);
                         if (index < photoSlots.length) {
                             drawImageToArea(ctx, imgData, photoSlots[index], isMirrored, canvas.width);
                         }
                     });
 
-                    // Draw the custom frame image on top
+                    // Draw the custom frame image on top (with transparent photo slots)
+                    console.log('DEBUG: Drawing frame overlay on top');
                     ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+                    console.log('DEBUG: Frame overlay drawn - photos should show through transparent areas');
 
                     // Clean up blob URL
                     URL.revokeObjectURL(blobUrl);
@@ -316,11 +323,17 @@ const CanvasCompositor = (function() {
      * Draw captured image data to specified area
      */
     function drawImageToArea(ctx, imgData, photoArea, isMirrored, canvasWidth) {
+        console.log('DEBUG drawImageToArea: imgData =', imgData);
+        console.log('DEBUG drawImageToArea: imgData.width =', imgData?.width, 'imgData.height =', imgData?.height);
+        console.log('DEBUG drawImageToArea: photoArea =', photoArea);
+
         ctx.save();
 
         // imgData is an ImageData or canvas from a previous capture
         const sourceWidth = imgData.width;
         const sourceHeight = imgData.height;
+
+        console.log('DEBUG drawImageToArea: sourceWidth =', sourceWidth, 'sourceHeight =', sourceHeight);
 
         const sourceAspect = sourceWidth / sourceHeight;
         const areaAspect = photoArea.width / photoArea.height;
@@ -339,11 +352,19 @@ const CanvasCompositor = (function() {
             sy = (sourceHeight - sh) / 2;
         }
 
-        ctx.drawImage(
-            imgData,
-            sx, sy, sw, sh,
-            photoArea.x, photoArea.y, photoArea.width, photoArea.height
-        );
+        console.log('DEBUG: About to drawImage with sx:', sx, 'sy:', sy, 'sw:', sw, 'sh:', sh);
+        console.log('DEBUG: Destination: x:', photoArea.x, 'y:', photoArea.y, 'w:', photoArea.width, 'h:', photoArea.height);
+
+        try {
+            ctx.drawImage(
+                imgData,
+                sx, sy, sw, sh,
+                photoArea.x, photoArea.y, photoArea.width, photoArea.height
+            );
+            console.log('DEBUG: drawImage completed successfully');
+        } catch (error) {
+            console.error('DEBUG: drawImage FAILED:', error);
+        }
 
         ctx.restore();
     }
