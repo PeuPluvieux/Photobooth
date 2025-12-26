@@ -1,0 +1,288 @@
+/**
+ * Photobooth Custom Styles
+ * Nordic Christmas Theme
+ * Complements Tailwind CSS for animations and custom effects
+ */
+
+/* CSS Custom Properties for Nordic Christmas Theme */
+:root {
+    /* Backgrounds */
+    --bg-primary: #FDF8F4;
+    --bg-secondary: #FAF5F0;
+    --bg-tertiary: #F0EBE5;
+
+    /* Text */
+    --text-primary: #1A3329;
+    --text-secondary: #5A7A6A;
+    --text-tertiary: #8A9A8E;
+
+    /* Accents */
+    --accent-primary: #2D5A47;
+    --accent-secondary: #3D7A5F;
+    --accent-hover: #1E4030;
+
+    /* Highlights */
+    --highlight: #C9A962;
+    --highlight-soft: #D4B87A;
+
+    /* Borders */
+    --border: #E8E2DC;
+    --border-strong: #D4CEC8;
+
+    /* Effects */
+    --shadow: rgba(26, 51, 41, 0.08);
+    --shadow-lg: rgba(26, 51, 41, 0.12);
+}
+
+/* Smooth screen transitions */
+.screen {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Countdown animation */
+.countdown-number {
+    animation: countdownPulse 1s ease-out;
+}
+
+.countdown-animate {
+    animation: countdownPulse 1s ease-out;
+}
+
+@keyframes countdownPulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Capture button pulse effect - Forest Green */
+#btn-capture {
+    position: relative;
+}
+
+#btn-capture::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(45, 90, 71, 0.3);
+    animation: capturePulse 2s infinite;
+}
+
+@keyframes capturePulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+    }
+}
+
+/* Flash effect */
+#flash-effect {
+    opacity: 0;
+    transition: opacity 0.1s ease-out;
+}
+
+/* Template card hover effect - Pine shadow */
+.template-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.template-card:hover {
+    box-shadow: 0 10px 40px rgba(26, 51, 41, 0.15);
+}
+
+/* Camera preview video */
+#camera-preview {
+    background: #000;
+}
+
+/* Mirror button active state - Forest glow */
+#btn-mirror.bg-forest {
+    box-shadow: 0 0 10px rgba(45, 90, 71, 0.5);
+}
+
+/* Timer button styles */
+.timer-btn {
+    transition: all 0.2s ease;
+}
+
+.timer-btn:hover {
+    transform: scale(1.05);
+}
+
+.timer-btn.bg-forest {
+    box-shadow: 0 0 10px rgba(45, 90, 71, 0.5);
+}
+
+/* Result canvas display */
+#result-canvas {
+    max-height: calc(100vh - 280px);
+    width: auto;
+    height: auto;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 640px) {
+    #result-canvas {
+        max-height: calc(100vh - 320px);
+    }
+
+    .timer-btn {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+    #camera-container {
+        height: 100vh;
+    }
+
+    #screen-camera header {
+        padding: 0.5rem 1rem;
+    }
+
+    #screen-camera .absolute.bottom-0 {
+        padding: 0.5rem 1rem;
+    }
+
+    #btn-capture {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    #btn-capture > div {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+
+/* Safe area for notched phones */
+@supports (padding: max(0px)) {
+    #screen-camera header {
+        padding-top: max(1rem, env(safe-area-inset-top));
+    }
+
+    #screen-camera .absolute.bottom-0 {
+        padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    }
+}
+
+/* Loading spinner - Forest Green */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(45, 90, 71, 0.2);
+    border-top-color: #2D5A47;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Smooth scrolling for template grid */
+#template-grid {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Scrollbar styling - Forest themed */
+#template-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+#template-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#template-grid::-webkit-scrollbar-thumb {
+    background: rgba(45, 90, 71, 0.2);
+    border-radius: 3px;
+}
+
+#template-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(45, 90, 71, 0.3);
+}
+
+/* Error modal animation */
+#error-modal > div {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Button press effect */
+button:active {
+    transform: scale(0.97);
+}
+
+/* Prevent text selection during capture */
+#screen-camera {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Gradient text effect - Forest version */
+.gradient-text {
+    background: linear-gradient(135deg, #2D5A47 0%, #3D7A5F 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Gold star accent (optional decorative) */
+.gold-accent {
+    color: #C9A962;
+    text-shadow: 0 0 10px rgba(201, 169, 98, 0.3);
+}
+
+/* Festive gold shimmer animation (optional) */
+@keyframes goldShimmer {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.gold-shimmer {
+    animation: goldShimmer 2s ease-in-out infinite;
+}

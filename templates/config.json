@@ -1,0 +1,64 @@
+{
+  "_readme": "Add your custom templates here. See README files in each subfolder for details.",
+
+  "frames": [
+    {
+      "id": "example-frame",
+      "name": "Example Frame",
+      "file": "frames/example-frame.png",
+      "orientation": "portrait",
+      "shots": 1,
+      "_comment": "Add your PNG frame files to templates/frames/"
+    }
+  ],
+
+  "stickers": [
+    {
+      "id": "heart",
+      "name": "Heart",
+      "file": "stickers/heart.png"
+    },
+    {
+      "id": "star",
+      "name": "Star",
+      "file": "stickers/star.png"
+    },
+    {
+      "id": "sparkle",
+      "name": "Sparkle",
+      "file": "stickers/sparkle.png"
+    }
+  ],
+
+  "backgrounds": [
+    {
+      "id": "confetti",
+      "name": "Confetti",
+      "file": "backgrounds/confetti.png"
+    }
+  ],
+
+  "designThemes": [
+    {
+      "id": "custom-love",
+      "name": "Custom Love Theme",
+      "frame": null,
+      "stickers": ["stickers/heart.png", "stickers/sparkle.png"],
+      "positions": [
+        {"sticker": 0, "x": 0.08, "y": 0.05, "size": 0.12},
+        {"sticker": 0, "x": 0.92, "y": 0.05, "size": 0.12},
+        {"sticker": 1, "x": 0.08, "y": 0.95, "size": 0.08},
+        {"sticker": 1, "x": 0.92, "y": 0.95, "size": 0.08}
+      ],
+      "_comment": "x/y are 0-1 (percentage), size is relative to canvas size"
+    },
+    {
+      "id": "custom-framed",
+      "name": "Custom Framed",
+      "frame": "frames/example-frame.png",
+      "stickers": [],
+      "positions": [],
+      "_comment": "This theme uses a custom frame overlay"
+    }
+  ]
+}

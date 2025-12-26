@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Photobooth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Primary backgrounds
+                        'snow-cream': '#FDF8F4',
+                        'warm-white': '#FAF5F0',
+                        'pine-mist': '#F0EBE5',
+                        // Text colors
+                        'deep-evergreen': '#1A3329',
+                        'sage': '#5A7A6A',
+                        'soft-sage': '#8A9A8E',
+                        // Accent colors
+                        'forest': '#2D5A47',
+                        'pine': '#3D7A5F',
+                        'deep-forest': '#1E4030',
+                        // Highlight colors
+                        'gold-star': '#C9A962',
+                        'warm-gold': '#D4B87A',
+                        // Border colors
+                        'frost': '#E8E2DC',
+                        'winter-gray': '#D4CEC8',
+                        // Legacy support
+                        primary: '#2D5A47',
+                        secondary: '#3D7A5F'
+                    },
+                    boxShadow: {
+                        'pine': '0 4px 20px rgba(26, 51, 41, 0.08)',
+                        'pine-lg': '0 10px 40px rgba(26, 51, 41, 0.12)',
+                        'pine-xl': '0 20px 50px rgba(26, 51, 41, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-snow-cream text-deep-evergreen min-h-screen">
+    <div id="app" class="min-h-screen flex flex-col">
+
+        <!-- Screen 1: Landing -->
+        <section id="screen-landing" class="screen flex-1 flex flex-col items-center justify-center p-6">
+            <div class="text-center max-w-md">
+                <div class="mb-8">
+                    <div class="w-24 h-24 mx-auto bg-gradient-to-br from-forest to-pine rounded-2xl flex items-center justify-center mb-6 shadow-pine-lg">
+                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-4xl font-bold mb-2 text-deep-evergreen">Tanggera ng Taon</h1>
+                    <p class="text-lg font-semibold text-forest mb-1">Christmas Party Photobooth 2025</p>
+                    <p class="text-sage">Capture memories with style</p>
+                </div>
+
+                <button id="btn-start" class="w-full bg-gradient-to-r from-forest to-pine text-white font-semibold py-4 px-8 rounded-xl text-lg hover:opacity-90 transition-opacity shadow-pine">
+                    Start Photobooth
+                </button>
+
+                <p class="mt-6 text-sm text-soft-sage">
+                    Works with any camera — phone, webcam, or professional
+                </p>
+            </div>
+        </section>
+
+        <!-- Screen 2: Template Selection -->
+        <section id="screen-templates" class="screen hidden flex-1 flex flex-col items-center justify-center p-6">
+            <div class="text-center max-w-2xl w-full">
+                <button id="btn-back-landing" class="absolute top-4 left-4 p-2 hover:bg-pine-mist rounded-lg transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+
+                <h2 class="text-3xl font-bold mb-3 text-deep-evergreen">Choose Your Template</h2>
+                <p class="text-sage mb-12">Select how many photos you want in your strip</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 2 Photo Template -->
+                    <button class="template-choice-btn group relative bg-white hover:bg-warm-white border-2 border-frost hover:border-forest rounded-2xl p-8 transition-all duration-200 hover:scale-105 hover:shadow-pine-lg" data-template-id="2-picture">
+                        <div class="text-6xl mb-4">📸📸</div>
+                        <h3 class="text-2xl font-bold text-deep-evergreen mb-2">2 Photos</h3>
+                        <p class="text-soft-sage">Classic photo strip with 2 shots</p>
+                        <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-frost group-hover:border-forest group-hover:bg-forest transition-all">
+                            <svg class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- 3 Photo Template -->
+                    <button class="template-choice-btn group relative bg-white hover:bg-warm-white border-2 border-frost hover:border-forest rounded-2xl p-8 transition-all duration-200 hover:scale-105 hover:shadow-pine-lg" data-template-id="3-picture">
+                        <div class="text-6xl mb-4">📸📸📸</div>
+                        <h3 class="text-2xl font-bold text-deep-evergreen mb-2">3 Photos</h3>
+                        <p class="text-soft-sage">Extended photo strip with 3 shots</p>
+                        <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-frost group-hover:border-forest group-hover:bg-forest transition-all">
+                            <svg class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 3: Camera Preview -->
+        <section id="screen-camera" class="screen hidden flex-1 flex flex-col">
+            <header class="flex items-center justify-between p-4 absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-snow-cream/90 to-transparent">
+                <button id="btn-back-templates" class="p-2 bg-white/80 hover:bg-white rounded-lg transition-colors backdrop-blur border border-frost text-deep-evergreen">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <select id="camera-select" class="bg-white/90 backdrop-blur border border-frost rounded-lg px-3 py-2 text-sm text-deep-evergreen focus:outline-none focus:ring-2 focus:ring-forest">
+                        <option>Loading cameras...</option>
+                    </select>
+
+                    <button id="btn-mirror" class="p-2 bg-white/80 hover:bg-white rounded-lg transition-colors backdrop-blur border border-frost text-deep-evergreen" title="Mirror">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Mode Indicator -->
+            <div id="mode-indicator" class="hidden absolute top-16 left-1/2 -translate-x-1/2 z-20 bg-forest/90 backdrop-blur px-4 py-1.5 rounded-full text-sm font-medium text-white">
+                4-Photo Strip
+            </div>
+
+            <!-- Camera Preview Container -->
+            <div id="camera-container" class="flex-1 relative overflow-hidden bg-black">
+                <video id="camera-preview" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
+                <div id="template-overlay" class="absolute inset-0 pointer-events-none bg-contain bg-center bg-no-repeat"></div>
+
+                <!-- Shot Indicator (for multi-shot mode) -->
+                <div id="shot-indicator" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                    <div class="bg-black/70 backdrop-blur-sm px-6 py-3 rounded-2xl">
+                        <span class="shot-text text-xl font-bold text-white">Photo 1 of 4</span>
+                    </div>
+                </div>
+
+                <!-- Countdown Display -->
+                <div id="countdown-display" class="hidden absolute inset-0 flex items-center justify-center bg-black/50 z-20">
+                    <span class="text-9xl font-bold text-white countdown-number"></span>
+                </div>
+
+                <!-- Flash Effect -->
+                <div id="flash-effect" class="hidden absolute inset-0 bg-white z-30"></div>
+            </div>
+
+            <!-- Captured Thumbnails (for multi-shot mode) -->
+            <div id="captured-thumbnails" class="hidden absolute left-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
+                <!-- Thumbnails will be injected here -->
+            </div>
+
+            <!-- Camera Controls -->
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-snow-cream via-snow-cream/90 to-transparent">
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <span class="text-sm text-sage">Timer:</span>
+                    <div class="flex gap-2">
+                        <button class="timer-btn px-3 py-1 rounded-full text-sm bg-white border border-frost text-sage hover:bg-pine-mist transition-colors" data-seconds="0">Off</button>
+                        <button class="timer-btn px-3 py-1 rounded-full text-sm bg-forest text-white" data-seconds="3">3s</button>
+                        <button class="timer-btn px-3 py-1 rounded-full text-sm bg-white border border-frost text-sage hover:bg-pine-mist transition-colors" data-seconds="5">5s</button>
+                        <button class="timer-btn px-3 py-1 rounded-full text-sm bg-white border border-frost text-sage hover:bg-pine-mist transition-colors" data-seconds="10">10s</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center">
+                    <button id="btn-capture" class="w-20 h-20 bg-snow-cream rounded-full flex items-center justify-center hover:scale-105 transition-transform active:scale-95 shadow-pine-lg">
+                        <div class="w-16 h-16 bg-snow-cream rounded-full border-4 border-forest"></div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 4: Review -->
+        <section id="screen-review" class="screen hidden flex-1 flex flex-col p-4 bg-snow-cream">
+            <header class="flex items-center justify-between mb-4">
+                <button id="btn-retake" class="flex items-center gap-2 p-2 hover:bg-pine-mist rounded-lg transition-colors text-deep-evergreen">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span>Retake</span>
+                </button>
+                <h2 class="text-xl font-semibold text-deep-evergreen">Your Photo</h2>
+                <div class="w-20"></div>
+            </header>
+
+            <div class="flex-1 flex items-center justify-center overflow-hidden">
+                <canvas id="result-canvas" class="max-w-full max-h-full object-contain rounded-lg shadow-pine-xl"></canvas>
+            </div>
+
+            <div class="mt-6 space-y-3">
+                <div class="flex gap-3">
+                    <button id="btn-download" class="flex-1 bg-gradient-to-r from-forest to-pine text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-pine">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Download
+                    </button>
+
+                    <button id="btn-share" class="flex-1 bg-warm-white text-deep-evergreen font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-pine-mist transition-colors border border-frost">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        Share
+                    </button>
+                </div>
+
+                <button id="btn-new-photo" class="w-full bg-white text-deep-evergreen font-semibold py-4 px-6 rounded-xl hover:bg-pine-mist transition-colors border border-frost">
+                    Take Another Photo
+                </button>
+            </div>
+        </section>
+
+        <!-- Error Modal -->
+        <div id="error-modal" class="hidden fixed inset-0 bg-deep-evergreen/60 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-pine-xl">
+                <div class="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2 text-deep-evergreen">Camera Access Required</h3>
+                <p id="error-message" class="text-sage mb-6">Please allow camera access to use the photobooth.</p>
+                <button id="btn-close-error" class="w-full bg-forest text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity">
+                    Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/templates.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/capture.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/builder.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
