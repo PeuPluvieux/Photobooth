@@ -139,16 +139,16 @@ const App = (function() {
         // Template editor navigation
         elements.btnCreateTemplate.addEventListener('click', () => {
             showScreen('templateEditor');
-            TemplateEditor.reset();
+            TemplateEditor.resetEditor();
         });
 
         elements.btnCancelEditor.addEventListener('click', () => {
             showScreen('templates');
-            TemplateEditor.reset();
+            TemplateEditor.resetEditor();
         });
 
         elements.btnSaveTemplate.addEventListener('click', () => {
-            TemplateEditor.save();
+            TemplateEditor.saveTemplate();
         });
     }
 
