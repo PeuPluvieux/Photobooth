@@ -29,6 +29,9 @@ const App = (function() {
             shotIndicator: elements.shotIndicator
         });
 
+        // Initialize TemplateEditor
+        TemplateEditor.init();
+
         // Bind template selection
         bindTemplateSelection();
 
@@ -46,7 +49,8 @@ const App = (function() {
             landing: document.getElementById('screen-landing'),
             templates: document.getElementById('screen-templates'),
             camera: document.getElementById('screen-camera'),
-            review: document.getElementById('screen-review')
+            review: document.getElementById('screen-review'),
+            templateEditor: document.getElementById('screen-template-editor')
         };
 
         elements.btnStart = document.getElementById('btn-start');
@@ -59,6 +63,9 @@ const App = (function() {
         elements.btnNewPhoto = document.getElementById('btn-new-photo');
         elements.btnMirror = document.getElementById('btn-mirror');
         elements.btnCloseError = document.getElementById('btn-close-error');
+        elements.btnCreateTemplate = document.getElementById('btn-create-template');
+        elements.btnCancelEditor = document.getElementById('btn-cancel-editor');
+        elements.btnSaveTemplate = document.getElementById('btn-save-template');
 
         elements.cameraSelect = document.getElementById('camera-select');
         elements.cameraPreview = document.getElementById('camera-preview');
@@ -73,6 +80,9 @@ const App = (function() {
         elements.errorMessage = document.getElementById('error-message');
         elements.timerButtons = document.querySelectorAll('.timer-btn');
         elements.modeIndicator = document.getElementById('mode-indicator');
+        elements.customTemplatesGrid = document.getElementById('custom-templates-grid');
+        elements.customTemplatesSection = document.getElementById('custom-templates-section');
+        elements.templateCount = document.getElementById('template-count');
     }
 
     /**
@@ -125,6 +135,21 @@ const App = (function() {
             elements.errorModal.classList.add('hidden');
             startCameraScreen();
         });
+
+        // Template editor navigation
+        elements.btnCreateTemplate.addEventListener('click', () => {
+            showScreen('templateEditor');
+            TemplateEditor.reset();
+        });
+
+        elements.btnCancelEditor.addEventListener('click', () => {
+            showScreen('templates');
+            TemplateEditor.reset();
+        });
+
+        elements.btnSaveTemplate.addEventListener('click', () => {
+            TemplateEditor.save();
+        });
     }
 
     /**
@@ -137,6 +162,11 @@ const App = (function() {
 
         elements.screens[screenName].classList.remove('hidden');
         state.currentScreen = screenName;
+
+        // Render custom templates when showing template selection screen
+        if (screenName === 'templates') {
+            renderCustomTemplates();
+        }
     }
 
     /**
@@ -749,6 +779,124 @@ const App = (function() {
             return 'Camera does not support the required settings. Please try a different camera.';
         } else {
             return `Camera error: ${error.message}. Please try again.`;
+        }
+    }
+
+    /**
+     * Render custom templates in the template selection screen
+     */
+    function renderCustomTemplates() {
+        const customTemplates = Templates.getCustom();
+
+        // Show/hide custom templates section
+        if (customTemplates.length > 0) {
+            elements.customTemplatesSection.classList.remove('hidden');
+            elements.templateCount.textContent = `${customTemplates.length} / ${TemplateStorage.MAX_TEMPLATES}`;
+        } else {
+            elements.customTemplatesSection.classList.add('hidden');
+        }
+
+        // Render custom template cards
+        elements.customTemplatesGrid.innerHTML = customTemplates.map(template => `
+            <div class="template-choice-btn group relative bg-white hover:bg-warm-white border-2 border-frost hover:border-forest rounded-2xl overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-pine-lg" data-template-id="${template.id}">
+                <!-- Template Preview -->
+                <div class="aspect-[9/16] bg-black relative overflow-hidden">
+                    <img src="${template.frameImageData}" alt="${template.name}" class="w-full h-full object-contain">
+                </div>
+
+                <!-- Template Info -->
+                <div class="p-4">
+                    <h3 class="text-lg font-bold text-deep-evergreen mb-1">${template.name}</h3>
+                    <p class="text-sm text-soft-sage">${template.shots} ${template.shots === 1 ? 'photo' : 'photos'}</p>
+                </div>
+
+                <!-- Actions Menu -->
+                <div class="absolute top-2 right-2">
+                    <button class="template-menu-btn p-2 bg-white/90 hover:bg-white rounded-lg shadow-pine transition-colors" data-template-id="${template.id}" onclick="event.stopPropagation();">
+                        <svg class="w-5 h-5 text-deep-evergreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Checkmark -->
+                <div class="absolute top-2 left-2 w-6 h-6 rounded-full border-2 border-frost group-hover:border-forest group-hover:bg-forest transition-all">
+                    <svg class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+            </div>
+        `).join('');
+
+        // Rebind template selection and menu events
+        bindCustomTemplateEvents();
+    }
+
+    /**
+     * Bind event listeners for custom template cards
+     */
+    function bindCustomTemplateEvents() {
+        // Template selection
+        elements.customTemplatesGrid.querySelectorAll('.template-choice-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Don't trigger if clicking menu button
+                if (e.target.closest('.template-menu-btn')) return;
+
+                const templateId = btn.dataset.templateId;
+                Templates.select(templateId);
+                startCameraScreen();
+            });
+        });
+
+        // Template menu buttons
+        elements.customTemplatesGrid.querySelectorAll('.template-menu-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showTemplateMenu(btn.dataset.templateId);
+            });
+        });
+    }
+
+    /**
+     * Show template management menu
+     */
+    function showTemplateMenu(templateId) {
+        const actions = [
+            { label: 'Edit', action: () => editTemplate(templateId) },
+            { label: 'Delete', action: () => deleteTemplate(templateId) }
+        ];
+
+        // Simple confirm dialog (can be enhanced with custom modal later)
+        const choice = confirm('Would you like to Edit or Delete this template?\n\nClick OK to Edit, Cancel to Delete');
+
+        if (choice) {
+            editTemplate(templateId);
+        } else {
+            const confirmDelete = confirm('Are you sure you want to delete this template? This cannot be undone.');
+            if (confirmDelete) {
+                deleteTemplate(templateId);
+            }
+        }
+    }
+
+    /**
+     * Edit a custom template
+     */
+    function editTemplate(templateId) {
+        showScreen('templateEditor');
+        TemplateEditor.loadTemplate(templateId);
+    }
+
+    /**
+     * Delete a custom template
+     */
+    function deleteTemplate(templateId) {
+        try {
+            Templates.deleteTemplate(templateId);
+            renderCustomTemplates(); // Refresh the list
+            alert('Template deleted successfully');
+        } catch (error) {
+            alert(`Error deleting template: ${error.message}`);
         }
     }
 

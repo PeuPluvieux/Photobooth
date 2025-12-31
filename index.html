@@ -108,6 +108,27 @@
                         </div>
                     </button>
                 </div>
+
+                <!-- Custom Templates Section -->
+                <div id="custom-templates-section" class="mt-8 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-deep-evergreen">Custom Templates</h3>
+                        <span id="template-count" class="text-sm text-sage"></span>
+                    </div>
+                    <div id="custom-templates-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Create Template Button -->
+                <button id="btn-create-template" class="w-full mt-8 bg-white hover:bg-warm-white border-2 border-dashed border-forest/30 hover:border-forest rounded-2xl p-6 transition-all duration-200 hover:shadow-pine group">
+                    <div class="flex items-center justify-center gap-3 text-forest">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span class="text-lg font-semibold">Create Custom Template</span>
+                    </div>
+                </button>
             </div>
         </section>
 
@@ -224,6 +245,98 @@
             </div>
         </section>
 
+        <!-- Screen 5: Template Editor -->
+        <section id="screen-template-editor" class="screen hidden flex-1 flex flex-col">
+            <header class="flex items-center justify-between p-4 bg-warm-white border-b border-frost">
+                <button id="btn-cancel-editor" class="flex items-center gap-2 p-2 hover:bg-pine-mist rounded-lg transition-colors text-deep-evergreen">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back</span>
+                </button>
+                <h2 class="text-xl font-bold text-deep-evergreen">Template Editor</h2>
+                <button id="btn-save-template" class="bg-gradient-to-r from-forest to-pine text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                    Save
+                </button>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                <!-- Step 1: Upload Frame Image -->
+                <div class="bg-white rounded-xl p-6 shadow-pine border border-frost">
+                    <h3 class="text-lg font-bold text-deep-evergreen mb-2">1. Upload Frame Image</h3>
+                    <p class="text-sm text-sage mb-4">Upload a PNG image (max 5MB). Recommended size: 1080x1920px for Instagram Stories.</p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <label for="frame-upload" class="flex-shrink-0 bg-forest text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity cursor-pointer">
+                                Choose File
+                            </label>
+                            <input type="file" id="frame-upload" accept="image/png" class="hidden">
+                            <span id="file-name" class="text-sm text-soft-sage">No file selected</span>
+                        </div>
+
+                        <!-- Frame Preview -->
+                        <div id="frame-preview-container" class="hidden">
+                            <div class="bg-pine-mist rounded-lg p-4">
+                                <div class="flex items-start gap-4">
+                                    <img id="frame-preview-img" src="" alt="Frame preview" class="w-32 h-56 object-contain rounded border-2 border-frost">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-deep-evergreen mb-2">Frame Details</h4>
+                                        <div class="text-sm text-sage space-y-1">
+                                            <p><strong>Dimensions:</strong> <span id="frame-dimensions">-</span></p>
+                                            <p><strong>File size:</strong> <span id="frame-file-size">-</span></p>
+                                            <p id="frame-size-warning" class="text-amber-700 font-medium hidden"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Template Details -->
+                <div id="template-details-section" class="hidden bg-white rounded-xl p-6 shadow-pine border border-frost">
+                    <h3 class="text-lg font-bold text-deep-evergreen mb-2">2. Template Details</h3>
+                    <p class="text-sm text-sage mb-4">Give your template a name and choose the number of photo slots.</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="template-name" class="block text-sm font-medium text-deep-evergreen mb-2">Template Name</label>
+                            <input type="text" id="template-name" placeholder="e.g., Wedding Portrait" maxlength="50" class="w-full px-4 py-2 border border-frost rounded-lg focus:outline-none focus:ring-2 focus:ring-forest text-deep-evergreen">
+                        </div>
+
+                        <div>
+                            <label for="shot-count" class="block text-sm font-medium text-deep-evergreen mb-2">Number of Photos</label>
+                            <div class="flex gap-3">
+                                <button class="shot-count-btn flex-1 py-3 px-4 border-2 border-frost rounded-lg text-deep-evergreen hover:border-forest transition-colors" data-shots="2">
+                                    <span class="text-2xl block mb-1">📸📸</span>
+                                    <span class="font-semibold">2 Photos</span>
+                                </button>
+                                <button class="shot-count-btn flex-1 py-3 px-4 border-2 border-frost rounded-lg text-deep-evergreen hover:border-forest transition-colors" data-shots="3">
+                                    <span class="text-2xl block mb-1">📸📸📸</span>
+                                    <span class="font-semibold">3 Photos</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Position Photo Slots -->
+                <div id="editor-canvas-section" class="hidden bg-white rounded-xl p-6 shadow-pine border border-frost">
+                    <h3 class="text-lg font-bold text-deep-evergreen mb-2">3. Position Photo Slots</h3>
+                    <p class="text-sm text-sage mb-4">Drag the green boxes to position them. Drag the corner handles to resize.</p>
+
+                    <div class="bg-black rounded-lg overflow-hidden">
+                        <canvas id="editor-canvas" class="w-full h-auto cursor-move touch-none"></canvas>
+                    </div>
+
+                    <div id="slot-info" class="mt-4 p-3 bg-pine-mist rounded-lg">
+                        <p class="text-xs text-sage text-center">Click a photo slot to see its coordinates</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Error Modal -->
         <div id="error-modal" class="hidden fixed inset-0 bg-deep-evergreen/60 flex items-center justify-center p-4 z-50">
             <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-pine-xl">
@@ -248,6 +361,9 @@
 
     <!-- Scripts -->
     <script src="js/cropCalculator.js"></script>
+    <script src="js/templateStorage.js"></script>
+    <script src="js/templateUploader.js"></script>
+    <script src="js/templateEditor.js"></script>
     <script src="js/templates.js"></script>
     <script src="js/camera.js"></script>
     <script src="js/canvas.js"></script>
