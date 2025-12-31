@@ -264,35 +264,21 @@ const App = (function() {
         const containerWidth = container.offsetWidth;
         const containerHeight = container.offsetHeight;
 
-        // Calculate aspect ratio of the photo slot
-        const slotAspect = slot.width / slot.height;
-        const containerAspect = containerWidth / containerHeight;
-
-        let cropWidth, cropHeight, cropX, cropY;
-
-        // Calculate crop box to match slot aspect ratio, centered in container
-        if (containerAspect > slotAspect) {
-            // Container is wider - crop width based on height
-            cropHeight = containerHeight;
-            cropWidth = cropHeight * slotAspect;
-            cropX = (containerWidth - cropWidth) / 2;
-            cropY = 0;
-        } else {
-            // Container is taller - crop height based on width
-            cropWidth = containerWidth;
-            cropHeight = cropWidth / slotAspect;
-            cropX = 0;
-            cropY = (containerHeight - cropHeight) / 2;
-        }
+        // Use shared CropCalculator for consistent crop calculations
+        const cropBox = CropCalculator.calculatePreviewOverlay(
+            slot,
+            containerWidth,
+            containerHeight
+        );
 
         // Show crop box with darkened outside area
         overlay.innerHTML = `
             <div style="
                 position: absolute;
-                left: ${cropX}px;
-                top: ${cropY}px;
-                width: ${cropWidth}px;
-                height: ${cropHeight}px;
+                left: ${cropBox.x}px;
+                top: ${cropBox.y}px;
+                width: ${cropBox.width}px;
+                height: ${cropBox.height}px;
                 border: 3px solid rgba(255, 255, 255, 0.9);
                 box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.5);
                 display: flex;

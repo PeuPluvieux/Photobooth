@@ -168,26 +168,19 @@ const CanvasCompositor = (function() {
                     // Fill white background
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    console.log('DEBUG: White background drawn');
 
                     // Use exact photo slot positions from template
                     const photoSlots = template.photoSlots || [];
 
-                    console.log('DEBUG: capturedImages count:', capturedImages.length);
-                    console.log('DEBUG: photoSlots count:', photoSlots.length);
-
                     // Draw each captured image into its designated slot
                     capturedImages.forEach((imgData, index) => {
-                        console.log('DEBUG: Drawing image', index, 'to slot:', photoSlots[index]);
                         if (index < photoSlots.length) {
                             drawImageToArea(ctx, imgData, photoSlots[index], isMirrored, canvas.width);
                         }
                     });
 
                     // Draw the custom frame image on top (with transparent photo slots)
-                    console.log('DEBUG: Drawing frame overlay on top');
                     ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
-                    console.log('DEBUG: Frame overlay drawn - photos should show through transparent areas');
 
                     // Clean up blob URL
                     URL.revokeObjectURL(blobUrl);
@@ -291,28 +284,18 @@ const CanvasCompositor = (function() {
             ctx.scale(-1, 1);
         }
 
-        const videoAspect = videoElement.videoWidth / videoElement.videoHeight;
-        const areaAspect = photoArea.width / photoArea.height;
-
-        let sx, sy, sw, sh;
-
-        if (videoAspect > areaAspect) {
-            sh = videoElement.videoHeight;
-            sw = sh * areaAspect;
-            sx = (videoElement.videoWidth - sw) / 2;
-            sy = 0;
-        } else {
-            sw = videoElement.videoWidth;
-            sh = sw / areaAspect;
-            sx = 0;
-            sy = (videoElement.videoHeight - sh) / 2;
-        }
+        // Use shared CropCalculator for consistent crop calculations
+        const cropRegion = CropCalculator.calculateCropRegion(
+            photoArea,
+            videoElement.videoWidth,
+            videoElement.videoHeight
+        );
 
         const dx = isMirrored ? canvasWidth - photoArea.x - photoArea.width : photoArea.x;
 
         ctx.drawImage(
             videoElement,
-            sx, sy, sw, sh,
+            cropRegion.sx, cropRegion.sy, cropRegion.sw, cropRegion.sh,
             dx, photoArea.y, photoArea.width, photoArea.height
         );
 
@@ -323,48 +306,24 @@ const CanvasCompositor = (function() {
      * Draw captured image data to specified area
      */
     function drawImageToArea(ctx, imgData, photoArea, isMirrored, canvasWidth) {
-        console.log('DEBUG drawImageToArea: imgData =', imgData);
-        console.log('DEBUG drawImageToArea: imgData.width =', imgData?.width, 'imgData.height =', imgData?.height);
-        console.log('DEBUG drawImageToArea: photoArea =', photoArea);
-
         ctx.save();
 
         // imgData is an ImageData or canvas from a previous capture
         const sourceWidth = imgData.width;
         const sourceHeight = imgData.height;
 
-        console.log('DEBUG drawImageToArea: sourceWidth =', sourceWidth, 'sourceHeight =', sourceHeight);
+        // Use shared CropCalculator for consistent crop calculations
+        const cropRegion = CropCalculator.calculateCropRegion(
+            photoArea,
+            sourceWidth,
+            sourceHeight
+        );
 
-        const sourceAspect = sourceWidth / sourceHeight;
-        const areaAspect = photoArea.width / photoArea.height;
-
-        let sx, sy, sw, sh;
-
-        if (sourceAspect > areaAspect) {
-            sh = sourceHeight;
-            sw = sh * areaAspect;
-            sx = (sourceWidth - sw) / 2;
-            sy = 0;
-        } else {
-            sw = sourceWidth;
-            sh = sw / areaAspect;
-            sx = 0;
-            sy = (sourceHeight - sh) / 2;
-        }
-
-        console.log('DEBUG: About to drawImage with sx:', sx, 'sy:', sy, 'sw:', sw, 'sh:', sh);
-        console.log('DEBUG: Destination: x:', photoArea.x, 'y:', photoArea.y, 'w:', photoArea.width, 'h:', photoArea.height);
-
-        try {
-            ctx.drawImage(
-                imgData,
-                sx, sy, sw, sh,
-                photoArea.x, photoArea.y, photoArea.width, photoArea.height
-            );
-            console.log('DEBUG: drawImage completed successfully');
-        } catch (error) {
-            console.error('DEBUG: drawImage FAILED:', error);
-        }
+        ctx.drawImage(
+            imgData,
+            cropRegion.sx, cropRegion.sy, cropRegion.sw, cropRegion.sh,
+            photoArea.x, photoArea.y, photoArea.width, photoArea.height
+        );
 
         ctx.restore();
     }
