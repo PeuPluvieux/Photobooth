@@ -45,16 +45,19 @@ const TemplateEditor = (function() {
     function cacheElements() {
         elements.editorCanvas = document.getElementById('editor-canvas');
         elements.fileInput = document.getElementById('frame-upload');
-        elements.btnUpload = document.getElementById('btn-upload-frame');
+        elements.fileName = document.getElementById('file-name');
         elements.templateName = document.getElementById('template-name');
-        elements.shotCountSelect = document.getElementById('shot-count');
+        elements.shotCountButtons = document.querySelectorAll('.shot-count-btn');
         elements.btnSaveTemplate = document.getElementById('btn-save-template');
         elements.btnCancelEditor = document.getElementById('btn-cancel-editor');
         elements.framePreviewContainer = document.getElementById('frame-preview-container');
         elements.framePreviewImg = document.getElementById('frame-preview-img');
         elements.frameDimensions = document.getElementById('frame-dimensions');
-        elements.slotList = document.getElementById('slot-list');
-        elements.btnResetSlots = document.getElementById('btn-reset-slots');
+        elements.frameFileSize = document.getElementById('frame-file-size');
+        elements.frameSizeWarning = document.getElementById('frame-size-warning');
+        elements.templateDetailsSection = document.getElementById('template-details-section');
+        elements.editorCanvasSection = document.getElementById('editor-canvas-section');
+        elements.slotInfo = document.getElementById('slot-info');
 
         if (elements.editorCanvas) {
             canvas = elements.editorCanvas;
@@ -69,10 +72,6 @@ const TemplateEditor = (function() {
         if (!elements.fileInput) return;
 
         // File upload
-        elements.btnUpload?.addEventListener('click', () => {
-            elements.fileInput.click();
-        });
-
         elements.fileInput.addEventListener('change', handleFileUpload);
 
         // Canvas mouse events
@@ -88,18 +87,17 @@ const TemplateEditor = (function() {
             canvas.addEventListener('touchend', handleTouchEnd);
         }
 
-        // UI controls
-        elements.shotCountSelect?.addEventListener('change', handleShotCountChange);
-        elements.btnSaveTemplate?.addEventListener('click', saveTemplate);
-        elements.btnCancelEditor?.addEventListener('click', cancelEditor);
-        elements.btnResetSlots?.addEventListener('click', () => {
-            initializeDefaultSlots(state.shotCount);
-            renderEditor();
-            updateSlotList();
+        // Shot count buttons
+        elements.shotCountButtons?.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const shotCount = parseInt(btn.dataset.shots, 10);
+                handleShotCountChange(shotCount, btn);
+            });
         });
 
+        // Template name input
         elements.templateName?.addEventListener('input', (e) => {
-            state.templateName = e.target.value;
+            state.templateName = e.target.value.trim();
         });
     }
 
@@ -111,18 +109,28 @@ const TemplateEditor = (function() {
         if (!file) return;
 
         try {
+            // Update file name display
+            elements.fileName.textContent = file.name;
+
             // Process upload
             const imageData = await TemplateUploader.processUpload(file);
 
             // Show preview
             elements.framePreviewImg.src = imageData.dataUrl;
             elements.framePreviewContainer.classList.remove('hidden');
-            elements.frameDimensions.textContent = `${imageData.width} x ${imageData.height} pixels (${TemplateUploader.formatFileSize(file.size)})`;
+            elements.frameDimensions.textContent = `${imageData.width} x ${imageData.height}`;
+            elements.frameFileSize.textContent = TemplateUploader.formatFileSize(file.size);
 
-            // Show warning if needed
+            // Show/hide warning
             if (imageData.sizeWarning) {
-                alert(imageData.sizeWarning);
+                elements.frameSizeWarning.textContent = imageData.sizeWarning;
+                elements.frameSizeWarning.classList.remove('hidden');
+            } else {
+                elements.frameSizeWarning.classList.add('hidden');
             }
+
+            // Show template details section
+            elements.templateDetailsSection.classList.remove('hidden');
 
             // Load into editor
             loadFrameImage(imageData);
@@ -141,12 +149,8 @@ const TemplateEditor = (function() {
         state.frameWidth = imageData.width;
         state.frameHeight = imageData.height;
 
-        // Initialize default slots
-        initializeDefaultSlots(state.shotCount);
-
-        // Render editor
-        renderEditor();
-        updateSlotList();
+        // Don't initialize slots yet - wait for user to select shot count
+        // Slots will be initialized when they click a shot count button
     }
 
     /**
@@ -304,7 +308,7 @@ const TemplateEditor = (function() {
                 dragStart = { x: x - sx, y: y - sy };
                 canvas.style.cursor = 'move';
                 renderEditor();
-                updateSlotList();
+                updateSlotInfo();
                 return;
             }
         }
@@ -312,7 +316,7 @@ const TemplateEditor = (function() {
         // Clicked outside - deselect
         state.editingSlotIndex = -1;
         renderEditor();
-        updateSlotList();
+        updateSlotInfo();
     }
 
     /**
@@ -333,12 +337,12 @@ const TemplateEditor = (function() {
             state.photoSlots[activeSlot].y = Math.max(0, Math.min(newY, state.frameHeight - state.photoSlots[activeSlot].height));
 
             renderEditor();
-            updateSlotList();
+            updateSlotInfo();
         } else if (isResizing && activeSlot !== null) {
             // Resize slot
             resizeSlot(x, y);
             renderEditor();
-            updateSlotList();
+            updateSlotInfo();
         } else {
             // Update cursor based on hover
             updateCursor(x, y);
@@ -506,18 +510,54 @@ const TemplateEditor = (function() {
     }
 
     /**
+     * Update slot info display below canvas
+     */
+    function updateSlotInfo() {
+        if (!elements.slotInfo) return;
+
+        if (state.editingSlotIndex >= 0 && state.photoSlots[state.editingSlotIndex]) {
+            const slot = state.photoSlots[state.editingSlotIndex];
+            elements.slotInfo.innerHTML = `
+                <p class="text-xs text-deep-evergreen font-semibold">
+                    Photo ${state.editingSlotIndex + 1} - Position: (${slot.x}, ${slot.y}) • Size: ${slot.width} × ${slot.height}px
+                </p>
+            `;
+        } else {
+            elements.slotInfo.innerHTML = `
+                <p class="text-xs text-sage text-center">Click a photo slot to see its coordinates</p>
+            `;
+        }
+    }
+
+    /**
      * Handle shot count change
      */
-    function handleShotCountChange(e) {
-        const newCount = parseInt(e.target.value);
-        if (confirm(`Change to ${newCount} photos? This will reset slot positions.`)) {
-            state.shotCount = newCount;
-            initializeDefaultSlots(newCount);
-            renderEditor();
-            updateSlotList();
-        } else {
-            e.target.value = state.shotCount;
+    function handleShotCountChange(shotCount, button) {
+        // If slots already exist, confirm before changing
+        if (state.photoSlots.length > 0 && shotCount !== state.shotCount) {
+            if (!confirm(`Change to ${shotCount} photos? This will reset slot positions.`)) {
+                return;
+            }
         }
+
+        // Update button styles
+        elements.shotCountButtons.forEach(btn => {
+            btn.classList.remove('border-forest', 'bg-pine-mist');
+            btn.classList.add('border-frost');
+        });
+        button.classList.remove('border-frost');
+        button.classList.add('border-forest', 'bg-pine-mist');
+
+        // Update state and initialize slots
+        state.shotCount = shotCount;
+        initializeDefaultSlots(shotCount);
+
+        // Show editor canvas section
+        elements.editorCanvasSection.classList.remove('hidden');
+
+        // Render editor
+        renderEditor();
+        updateSlotInfo();
     }
 
     /**
