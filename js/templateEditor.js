@@ -195,8 +195,16 @@ const TemplateEditor = (function() {
             1 // Don't scale up
         );
 
-        canvas.width = state.frameWidth * scale;
-        canvas.height = state.frameHeight * scale;
+        const displayWidth = Math.floor(state.frameWidth * scale);
+        const displayHeight = Math.floor(state.frameHeight * scale);
+
+        // Set canvas buffer size (actual drawing resolution)
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+
+        // Set canvas CSS size to match buffer size (prevents stretching)
+        canvas.style.width = displayWidth + 'px';
+        canvas.style.height = displayHeight + 'px';
 
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
